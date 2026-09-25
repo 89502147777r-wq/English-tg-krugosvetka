@@ -209,6 +209,9 @@ h1, h2, h3, p { margin: 0; }
 .step-t { color: var(--muted); font-weight: 500; margin-bottom: 12px; }
 .stage { min-height: 300px; }
 
+.scene-wrap { position: relative; border-radius: 16px; overflow: hidden; }
+.scene-wrap .scene { display: block; }
+.scene-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .scene-intro h2 { font-size: 26px; font-weight: 800; margin: 16px 0 6px; letter-spacing: -0.01em; }
 .scene-intro p { color: var(--muted); font-size: 17px; margin-bottom: 20px; }
 .plan { display: grid; gap: 8px; margin-bottom: 20px; }
@@ -372,13 +375,13 @@ window.CONTENT = {
     { id: "uk", flag: "🇬🇧", name: "Великобритания", city: "Лондон", theme: "Знакомство и общение", situations: [
       { id: "uk1", title: "Привет и знакомство", npc: "Том", scene: "Вечеринка у друзей в Лондоне. К вам подходит Том.",
         words: [
-          ["hello", "həˈloʊ", "привет, здравствуйте", "Hello, how are you?", "Здравствуйте, как дела?"],
+          ["hello", "həˈləʊ", "привет, здравствуйте", "Hello, how are you?", "Здравствуйте, как дела?"],
           ["name", "neɪm", "имя", "What's your name?", "Как вас зовут?"],
           ["nice", "naɪs", "приятный, хороший", "It's a nice day.", "Хороший день."],
           ["meet", "miːt", "встречать, знакомиться", "Nice to meet you.", "Приятно познакомиться."],
-          ["from", "frʌm", "из, от", "I'm from a small town.", "Я из маленького города."],
+          ["from", "frɒm", "из, от", "I'm from a small town.", "Я из маленького города."],
           ["live", "lɪv", "жить", "Where do you live?", "Где вы живёте?"],
-          ["where", "wer", "где, куда", "Where is the station?", "Где вокзал?"],
+          ["where", "weə", "где, куда", "Where is the station?", "Где вокзал?"],
           ["how", "haʊ", "как", "How are you?", "Как дела?"]
         ],
         phrases: [
@@ -392,14 +395,14 @@ window.CONTENT = {
         ] },
       { id: "uk2", title: "О себе", npc: "Джейн", scene: "Поезд до Оксфорда. С вами заговорила попутчица Джейн.",
         words: [
-          ["work", "wɜːrk", "работать; работа", "I work from home.", "Я работаю из дома."],
-          ["job", "dʒɑːb", "работа, должность", "I like my job.", "Мне нравится моя работа."],
-          ["student", "ˈstuːdənt", "студент", "She is a student.", "Она студентка."],
+          ["work", "wɜːk", "работать; работа", "I work from home.", "Я работаю из дома."],
+          ["job", "dʒɒb", "работа, должность", "I like my job.", "Мне нравится моя работа."],
+          ["student", "ˈstjuːdənt", "студент", "She is a student.", "Она студентка."],
           ["study", "ˈstʌdi", "учиться, изучать", "I study English.", "Я изучаю английский."],
           ["company", "ˈkʌmpəni", "компания", "He works for a big company.", "Он работает в крупной компании."],
           ["city", "ˈsɪti", "город", "London is a big city.", "Лондон — большой город."],
           ["speak", "spiːk", "говорить", "Do you speak English?", "Вы говорите по-английски?"],
-          ["little", "ˈlɪtəl", "маленький; немного", "I know a little French.", "Я немного знаю французский."]
+          ["little", "ˈlɪtl", "маленький; немного", "I know a little French.", "Я немного знаю французский."]
         ],
         phrases: [
           ["What do you do?", "Чем вы занимаетесь?"],
@@ -413,13 +416,13 @@ window.CONTENT = {
       { id: "uk3", title: "Семья", npc: "Марк", scene: "Коллега Марк показывает вам фото своей семьи.",
         words: [
           ["family", "ˈfæməli", "семья", "I have a big family.", "У меня большая семья."],
-          ["parents", "ˈperənts", "родители", "My parents are retired.", "Мои родители на пенсии."],
+          ["parents", "ˈpeərənts", "родители", "My parents are retired.", "Мои родители на пенсии."],
           ["married", "ˈmærid", "женатый, замужем", "They got married last year.", "Они поженились в прошлом году."],
           ["children", "ˈtʃɪldrən", "дети", "Do you have children?", "У вас есть дети?"],
           ["son", "sʌn", "сын", "Our son is five.", "Нашему сыну пять лет."],
-          ["daughter", "ˈdɔːtər", "дочь", "My daughter loves music.", "Моя дочь любит музыку."],
+          ["daughter", "ˈdɔːtə", "дочь", "My daughter loves music.", "Моя дочь любит музыку."],
           ["wife", "waɪf", "жена", "This is my wife, Kate.", "Это моя жена Кейт."],
-          ["older", "ˈoʊldər", "старше, старший", "My sister is older than me.", "Моя сестра старше меня."]
+          ["older", "ˈəʊldə", "старше, старший", "My sister is older than me.", "Моя сестра старше меня."]
         ],
         phrases: [
           ["Are you married?", "Вы женаты (замужем)?"],
@@ -430,14 +433,14 @@ window.CONTENT = {
           { say: "Look, this is my family!", ru: "Смотрите, это моя семья!", options: ["Nice! Is this your wife?", "Sorry, I'm busy.", "What time is it?"] },
           { say: "Yes, that's Kate. Do you have children?", ru: "Да, это Кейт. У вас есть дети?", options: ["Yes, I have two children.", "It's freezing today.", "I work from home."] }
         ] },
-      { id: "uk4", title: "Время и даты", npc: "Прохожий", scene: "Улица в центре Лондона. Прохожий спрашивает у вас время.",
+      { id: "uk4", title: "Время и даты", npc: "Сэм", scene: "Вы гуляете по Лондону с другом Сэмом. Он забыл телефон в отеле.",
         words: [
           ["time", "taɪm", "время; раз", "What time is it?", "Который час?"],
-          ["o'clock", "əˈklɑːk", "час (ровно)", "The shop opens at nine o'clock.", "Магазин открывается в девять."],
-          ["half", "hæf", "половина", "It's half past two.", "Половина третьего."],
-          ["quarter", "ˈkwɔːrtər", "четверть", "It's a quarter to five.", "Без четверти пять."],
+          ["o'clock", "əˈklɒk", "час (ровно)", "The shop opens at nine o'clock.", "Магазин открывается в девять."],
+          ["half", "hɑːf", "половина", "It's half past two.", "Половина третьего."],
+          ["quarter", "ˈkwɔːtə", "четверть", "It's a quarter to five.", "Без четверти пять."],
           ["today", "təˈdeɪ", "сегодня", "I'm free today.", "Сегодня я свободен."],
-          ["tomorrow", "təˈmɑːroʊ", "завтра", "See you tomorrow.", "До завтра."],
+          ["tomorrow", "təˈmɒrəʊ", "завтра", "See you tomorrow.", "До завтра."],
           ["week", "wiːk", "неделя", "I work five days a week.", "Я работаю пять дней в неделю."],
           ["month", "mʌnθ", "месяц", "We moved here last month.", "Мы переехали сюда в прошлом месяце."]
         ],
@@ -447,19 +450,19 @@ window.CONTENT = {
           ["See you tomorrow.", "До завтра."]
         ],
         dialog: [
-          { say: "Excuse me, what time is it?", ru: "Извините, который час?", options: ["It's half past six.", "I'm from a small town.", "Nice to meet you."] },
-          { say: "Thanks! Can we meet tomorrow?", ru: "Спасибо! Можем встретиться завтра?", options: ["Sure. See you tomorrow!", "My daughter loves music.", "It looks like rain."] }
+          { say: "What time is it?", ru: "Который час?", options: ["It's half past six.", "I'm from a small town.", "Nice to meet you."] },
+          { say: "Oh, I have to go! Can we meet tomorrow?", ru: "Ой, мне пора! Встретимся завтра?", options: ["Sure. See you tomorrow!", "My daughter loves music.", "It looks like rain."] }
         ] },
       { id: "uk5", title: "Погода", npc: "Администратор", scene: "Утро в лондонском отеле. Вы выходите на прогулку.",
         words: [
-          ["weather", "ˈweðər", "погода", "The weather is great today.", "Сегодня отличная погода."],
+          ["weather", "ˈweðə", "погода", "The weather is great today.", "Сегодня отличная погода."],
           ["sunny", "ˈsʌni", "солнечный", "It's a sunny morning.", "Солнечное утро."],
-          ["rain", "reɪn", "дождь", "Take an umbrella, it's going to rain.", "Возьми зонт, будет дождь."],
-          ["cold", "koʊld", "холодный", "It's cold outside.", "На улице холодно."],
-          ["warm", "wɔːrm", "тёплый", "The water is warm.", "Вода тёплая."],
+          ["rain", "reɪn", "дождь", "Take an umbrella, it's going to rain.", "Возьмите зонт, будет дождь."],
+          ["cold", "kəʊld", "холодный", "It's cold outside.", "На улице холодно."],
+          ["warm", "wɔːm", "тёплый", "The water is warm.", "Вода тёплая."],
           ["wind", "wɪnd", "ветер", "The wind is very strong.", "Ветер очень сильный."],
-          ["snow", "snoʊ", "снег", "We had a lot of snow in winter.", "Зимой было много снега."],
-          ["forecast", "ˈfɔːrkæst", "прогноз", "The forecast says it will be sunny.", "По прогнозу будет солнечно."]
+          ["snow", "snəʊ", "снег", "We had a lot of snow in winter.", "Зимой было много снега."],
+          ["forecast", "ˈfɔːkɑːst", "прогноз", "The forecast says it will be sunny.", "По прогнозу будет солнечно."]
         ],
         phrases: [
           ["What's the weather like?", "Какая погода?"],
@@ -472,23 +475,23 @@ window.CONTENT = {
         ] },
       { id: "uk6", title: "Хобби", npc: "Лиза", scene: "Хостел в Лондоне. Вы знакомитесь с соседкой по комнате Лизой.",
         words: [
-          ["hobby", "ˈhɑːbi", "хобби", "My hobby is photography.", "Моё хобби — фотография."],
+          ["hobby", "ˈhɒbi", "хобби", "My hobby is photography.", "Моё хобби — фотография."],
           ["enjoy", "ɪnˈdʒɔɪ", "получать удовольствие, любить", "I enjoy long walks.", "Я люблю долгие прогулки."],
           ["music", "ˈmjuːzɪk", "музыка", "What kind of music do you like?", "Какую музыку вы любите?"],
           ["read", "riːd", "читать", "I read before bed.", "Я читаю перед сном."],
           ["cook", "kʊk", "готовить", "My husband cooks dinner.", "Ужин готовит мой муж."],
-          ["travel", "ˈtrævəl", "путешествовать", "We travel every summer.", "Мы путешествуем каждое лето."],
-          ["weekend", "ˈwiːkend", "выходные", "What are you doing this weekend?", "Что вы делаете в эти выходные?"],
-          ["favorite", "ˈfeɪvərɪt", "любимый", "Pizza is my favorite food.", "Пицца — моя любимая еда."]
+          ["travel", "ˈtrævl", "путешествовать", "We travel every summer.", "Мы путешествуем каждое лето."],
+          ["weekend", "ˌwiːkˈend", "выходные", "What are you doing this weekend?", "Что вы делаете в эти выходные?"],
+          ["favourite", "ˈfeɪvərɪt", "любимый", "Pizza is my favourite food.", "Пицца — моя любимая еда."]
         ],
         phrases: [
           ["What do you do in your free time?", "Чем вы занимаетесь в свободное время?"],
           ["I enjoy cooking.", "Я люблю готовить."],
-          ["What's your favorite movie?", "Какой ваш любимый фильм?"]
+          ["What's your favourite movie?", "Какой ваш любимый фильм?"]
         ],
         dialog: [
           { say: "What do you do in your free time?", ru: "Чем вы занимаетесь в свободное время?", options: ["I enjoy cooking.", "It's a quarter to five.", "Sorry, I don't understand."] },
-          { say: "Me too! What's your favorite food?", ru: "Я тоже! Какая ваша любимая еда?", options: ["Pizza is my favorite food.", "My parents are retired.", "See you tomorrow."] }
+          { say: "Me too! What's your favourite food?", ru: "Я тоже! Какая ваша любимая еда?", options: ["Pizza is my favourite food.", "My parents are retired.", "See you tomorrow."] }
         ] },
       { id: "uk7", title: "Договориться о встрече", npc: "Эмма", scene: "Новая знакомая Эмма хочет встретиться на выходных.",
         words: [
@@ -496,9 +499,9 @@ window.CONTENT = {
           ["busy", "ˈbɪzi", "занятой", "I'm busy on Monday.", "В понедельник я занят."],
           ["plan", "plæn", "план; планировать", "Do you have any plans?", "У вас есть планы?"],
           ["invite", "ɪnˈvaɪt", "приглашать", "I want to invite you to dinner.", "Хочу пригласить вас на ужин."],
-          ["later", "ˈleɪtər", "позже", "Let's talk later.", "Давайте поговорим позже."],
+          ["later", "ˈleɪtə", "позже", "Let's talk later.", "Давайте поговорим позже."],
           ["place", "pleɪs", "место", "I know a nice place for lunch.", "Я знаю хорошее место для обеда."],
-          ["sure", "ʃʊr", "конечно; уверенный", "Sure, why not?", "Конечно, почему бы и нет?"],
+          ["sure", "ʃɔː", "конечно; уверенный", "Sure, why not?", "Конечно, почему бы и нет?"],
           ["instead", "ɪnˈsted", "вместо этого", "Let's meet on Sunday instead.", "Давайте лучше встретимся в воскресенье."]
         ],
         phrases: [
@@ -513,11 +516,11 @@ window.CONTENT = {
       { id: "uk8", title: "Звонки и сообщения", npc: "Курьер", scene: "Вам звонит курьер, а вы на встрече.",
         words: [
           ["call", "kɔːl", "звонить; звонок", "I'll call you tonight.", "Я позвоню вам вечером."],
-          ["phone", "foʊn", "телефон", "My phone is dead.", "У меня сел телефон."],
+          ["phone", "fəʊn", "телефон", "My phone is dead.", "У меня сел телефон."],
           ["message", "ˈmesɪdʒ", "сообщение", "I got your message.", "Я получил ваше сообщение."],
           ["text", "tekst", "писать сообщение; текст", "Text me the address.", "Пришлите мне адрес сообщением."],
-          ["number", "ˈnʌmbər", "номер; число", "Is this the right number?", "Это правильный номер?"],
-          ["answer", "ˈænsər", "отвечать; ответ", "Nobody answers the phone.", "Никто не берёт трубку."],
+          ["number", "ˈnʌmbə", "номер; число", "Is this the right number?", "Это правильный номер?"],
+          ["answer", "ˈɑːnsə", "отвечать; ответ", "Nobody answers the phone.", "Никто не берёт трубку."],
           ["back", "bæk", "назад, обратно", "I'll be back in five minutes.", "Я вернусь через пять минут."],
           ["voice", "vɔɪs", "голос", "Send me a voice message.", "Пришлите мне голосовое сообщение."]
         ],
@@ -527,19 +530,19 @@ window.CONTENT = {
           ["What's your phone number?", "Какой у вас номер телефона?"]
         ],
         dialog: [
-          { say: "Hello! I have a delivery for you.", ru: "Здравствуйте! У меня для вас доставка.", options: ["Sorry, I'm busy. Can I call you back?", "Pizza is my favorite food.", "It's a sunny morning."] },
-          { say: "Sure. Text me when you're ready.", ru: "Конечно. Напишите, когда будете готовы.", options: ["OK, thank you!", "Where is the station?", "I have a big family."] }
+          { say: "Hello! I have a delivery for you.", ru: "Здравствуйте! У меня для вас доставка.", options: ["Sorry, I'm busy. Can I call you back?", "Pizza is my favourite food.", "It's a sunny morning."] },
+          { say: "Sure. Or just text me when you're ready.", ru: "Конечно. Или просто напишите, когда будете готовы.", options: ["OK, thank you!", "Where is the station?", "I have a big family."] }
         ] },
       { id: "uk9", title: "Вежливые просьбы", npc: "Прохожая", scene: "Вы спросили дорогу, но прохожая объяснила слишком быстро.",
         words: [
           ["please", "pliːz", "пожалуйста (просьба)", "Two coffees, please.", "Два кофе, пожалуйста."],
-          ["sorry", "ˈsɑːri", "извините; жаль", "Sorry, I'm late.", "Извините, я опоздал."],
-          ["excuse", "ɪkˈskjuːz", "извинять (excuse me — простите)", "Excuse me, is this seat free?", "Простите, это место свободно?"],
+          ["sorry", "ˈsɒri", "извините; жаль", "Sorry, I'm late.", "Извините, я опоздал."],
+          ["excuse", "ɪkˈskjuːz", "извинять, прощать", "Excuse me, is this seat free?", "Простите, это место свободно?"],
           ["could", "kʊd", "мог бы (вежливая просьба)", "Could you open the door?", "Не могли бы вы открыть дверь?"],
           ["help", "help", "помогать; помощь", "Can I help you?", "Вам помочь?"],
-          ["mind", "maɪnd", "возражать (do you mind)", "Do you mind if I sit here?", "Вы не против, если я сяду здесь?"],
+          ["mind", "maɪnd", "возражать, быть против", "Do you mind if I sit here?", "Вы не против, если я сяду здесь?"],
           ["repeat", "rɪˈpiːt", "повторять", "Could you repeat the question?", "Не могли бы вы повторить вопрос?"],
-          ["understand", "ˌʌndərˈstænd", "понимать", "I don't understand this word.", "Я не понимаю это слово."]
+          ["understand", "ˌʌndəˈstænd", "понимать", "I don't understand this word.", "Я не понимаю это слово."]
         ],
         phrases: [
           ["Could you help me, please?", "Не могли бы вы мне помочь?"],
@@ -547,7 +550,7 @@ window.CONTENT = {
           ["Could you say that again, please?", "Не могли бы вы повторить?"]
         ],
         dialog: [
-          { say: "Go straight, turn left at the second light, and it's next to the bank.", ru: "Идите прямо, на втором светофоре налево, это рядом с банком.", options: ["Sorry, could you say that again, please?", "I enjoy cooking.", "My phone is dead."] },
+          { say: "Go straight, turn left at the second traffic lights, and it's next to the bank.", ru: "Идите прямо, на втором светофоре налево, это рядом с банком.", options: ["Sorry, could you say that again, please?", "I enjoy cooking.", "My phone is dead."] },
           { say: "Of course. Go straight, then turn left.", ru: "Конечно. Идите прямо, потом налево.", options: ["Thank you for your help!", "Are you married?", "It's half past six."] }
         ] },
       { id: "uk10", title: "Прощание", npc: "Друзья", scene: "Последний вечер в Лондоне. Вы прощаетесь с новыми друзьями.",
@@ -556,9 +559,9 @@ window.CONTENT = {
           ["welcome", "ˈwelkəm", "добро пожаловать; не за что", "Welcome to London!", "Добро пожаловать в Лондон!"],
           ["goodbye", "ɡʊdˈbaɪ", "до свидания", "It's time to say goodbye.", "Пора прощаться."],
           ["soon", "suːn", "скоро", "See you soon!", "До скорого!"],
-          ["care", "ker", "забота (take care — береги себя)", "Take care of yourself.", "Береги себя."],
+          ["care", "keə", "забота, заботиться", "Take care of yourself.", "Береги себя."],
           ["great", "ɡreɪt", "отличный", "We had a great time.", "Мы отлично провели время."],
-          ["touch", "tʌtʃ", "касаться (keep in touch — оставаться на связи)", "Don't touch the paint!", "Не трогайте краску!"],
+          ["touch", "tʌtʃ", "касаться, прикосновение", "Don't touch the paint!", "Не трогайте краску!"],
           ["visit", "ˈvɪzɪt", "навещать, посещать", "Come and visit us!", "Приезжайте к нам в гости!"]
         ],
         phrases: [
@@ -762,7 +765,17 @@ function nextSit() { for (var i = 0; i < UK.situations.length; i++) if (!(UK.sit
 /* ================= Озвучка ================= */
 var TTS = "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function";
 var voice = null;
-function pickVoice() { try { var vs = speechSynthesis.getVoices() || []; voice = vs.filter(function (v) { return /^en[-_](GB|US)/i.test(v.lang); })[0] || vs.filter(function (v) { return /^en/i.test(v.lang); })[0] || null; } catch (e) {} }
+function pickVoice() { try {
+  var vs = (speechSynthesis.getVoices() || []).filter(function (v) { return /^en[-_]/i.test(v.lang); });
+  var junk = /albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley|compact/i;
+  var good = /(daniel|serena|kate|arthur|oliver|martha|stephanie|samantha|ava|zoe|evan|nathan|karen|moira|tessa|libby|sonia|ryan|google uk english|microsoft .*online)/i;
+  function score(v) { var n = v.name || "", s = 0;
+    if (junk.test(n)) s -= 100;
+    if (/premium/i.test(n)) s += 50; if (/enhanced|neural|natural/i.test(n)) s += 40;
+    if (good.test(n)) s += 20; if (/^en[-_]GB/i.test(v.lang)) s += 10; else if (/^en[-_]US/i.test(v.lang)) s += 5;
+    if (v.localService === false) s += 3; return s; }
+  vs.sort(function (a, b) { return score(b) - score(a); });
+  voice = vs[0] || null; } catch (e) {} }
 if (TTS) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {} }
 function speak(text) { if (!TTS) return; try { speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(text); u.lang = voice ? voice.lang : "en-GB"; u.rate = 0.9; if (voice) u.voice = voice; speechSynthesis.speak(u); } catch (e) {} }
 
@@ -783,6 +796,9 @@ var I = {
 };
 
 /* ================= Сцена: Лондон ================= */
+function sceneArt(sit) {
+  return '<div class="scene-wrap">' + sceneUK() + '<img class="scene-photo" src="' + sit.id + '.jpg" alt="" onerror="this.remove()"></div>';
+}
 function sceneUK() {
   var rain = "";
   for (var i = 0; i < 26; i++) { var x = (i * 37) % 360 + 8, y = (i * 53) % 150; rain += '<line x1="' + x + '" y1="' + y + '" x2="' + (x - 3) + '" y2="' + (y + 9) + '"/>'; }
@@ -1006,7 +1022,7 @@ function renderSession() {
   if (s.phase === "quiz") return renderQuiz();
   var sit = s.sit, h = topBar(phasePct(), (sit.index + 1) + "/10");
   if (s.phase === "scene") {
-    h += '<div class="scene-intro">' + sceneUK() + "<h2>" + esc(sit.title) + "</h2><p>" + esc(sit.scene) + "</p>" +
+    h += '<div class="scene-intro">' + sceneArt(sit) + "<h2>" + esc(sit.title) + "</h2><p>" + esc(sit.scene) + "</p>" +
       '<div class="plan">' + (s.learn.length ? "<div><i>1</i>" + s.learn.length + " " + plural(s.learn.length, "новое слово", "новых слова", "новых слов") + "</div>" : "<div><i>1</i>Все слова этой ситуации вы уже знаете</div>") +
       "<div><i>2</i>3 фразы на каждый день</div><div><i>3</i>Разговор: " + esc(sit.npc) + "</div><div><i>4</i>Задания на закрепление</div></div></div>" +
       '<button class="btn" data-a="next-phase">Поехали</button>';

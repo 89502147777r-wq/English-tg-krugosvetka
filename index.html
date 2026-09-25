@@ -859,7 +859,7 @@ function topBar(pct, right) {
 function renderOnboarding() {
   var dots = '<div class="dots" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i class="' + (i === obStep ? "on" : "") + '"></i>'; }).join("") + "</div>";
   if (obStep === 0) {
-    return '<div class="ob"><div class="grow">' + sceneUK() +
+    return '<div class="ob"><div class="grow">' + sceneArt({ id: "uk" }) +
       '<div class="flags" aria-hidden="true">' + C.countries.map(function (c) { return "<span>" + c.flag + "</span>"; }).join("") + "</div>" +
       "<h1>Кругосветка по английскому</h1>" +
       '<p class="lead">Вспомните школьный английский и объясняйтесь в кафе, аэропорту, отеле и на работе. 10 минут в день.</p>' +
@@ -927,7 +927,7 @@ function renderMap() {
     '<span class="chip' + (s ? "" : " off") + '" style="color:' + (s ? "var(--red)" : "") + '" title="Дней подряд">' + I.flame + s + '</span><span class="chip" style="color:var(--gold)" title="Очки">' + I.star + state.xp + "</span></header>";
   h += '<div class="goal">' + ringSvg(tx, state.goal) + "<div><b>" + (tx >= state.goal ? "Цель дня выполнена" : "Цель дня: " + tx + " из " + state.goal) + "</b><span>" +
     (tx >= state.goal ? "Серия продлена, можно продолжать" : "Осталось " + (state.goal - tx) + " " + plural(state.goal - tx, "очко", "очка", "очков")) + "</span></div></div>";
-  h += '<article class="airmail country"><div class="inner">' + sceneUK() + '<div class="cap"><b>' + UK.flag + " " + UK.name + "</b><span>" + UK.city + '</span></div><div class="sub">' + UK.theme + ". Пройдено " + n + " из 10 ситуаций</div>" +
+  h += '<article class="airmail country"><div class="inner">' + sceneArt({ id: "uk" }) + '<div class="cap"><b>' + UK.flag + " " + UK.name + "</b><span>" + UK.city + '</span></div><div class="sub">' + UK.theme + ". Пройдено " + n + " из 10 ситуаций</div>" +
     '<div class="progress-line"><i style="width:' + (n * 10) + '%"></i></div>' +
     (next ? '<button class="btn" data-a="sit" data-v="' + next.id + '">Ситуация ' + (next.index + 1) + ": " + esc(next.title) + "</button>"
           : state.visas.uk ? '<button class="btn quiet" disabled>Виза получена, следующая страна скоро</button>'

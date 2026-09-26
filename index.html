@@ -183,6 +183,18 @@ button.nc .flag { filter: none; }
 .trip .tc.cur { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(36, 70, 200, 0.15); cursor: pointer; }
 .trip .tc.viewing { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(232, 180, 76, 0.25); }
 .trip .tc i { position: absolute; right: -4px; bottom: -4px; width: 16px; height: 16px; border-radius: 50%; background: #139A63; color: #fff; font-size: 10px; font-style: normal; font-weight: 800; display: grid; place-items: center; }
+.ticket { display: flex; margin: 0 0 12px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); overflow: hidden; position: relative; }
+.ticket .tk-main { flex: 1; padding: 14px 14px 12px; min-width: 0; }
+.ticket .tk-top { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; }
+.ticket .tk-route { display: flex; align-items: center; gap: 8px; margin: 10px 0 8px; }
+.ticket .tk-route b { font-size: 24px; font-weight: 800; letter-spacing: 0.02em; }
+.ticket .tk-route small { display: block; font-size: 11px; color: var(--muted); font-weight: 600; }
+.ticket .tk-route .plane { flex: 1; text-align: center; color: var(--blue); font-size: 18px; border-bottom: 2px dashed var(--line); line-height: 1; padding-bottom: 4px; }
+.ticket .tk-info { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
+.ticket .tk-info b { display: block; color: var(--ink); font-size: 14px; }
+.ticket .tk-stub { width: 74px; border-left: 2px dashed var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: color-mix(in srgb, var(--gold) 18%, var(--card)); font-size: 11px; font-weight: 700; color: var(--muted); }
+.ticket .tk-stub b { font-size: 22px; color: var(--ink); }
+.btn.small { min-height: 46px; font-size: 16px; }
 .back-link { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 12px; padding: 8px 12px; border: 0; border-radius: 12px; background: var(--card); color: var(--blue); font: inherit; font-weight: 700; box-shadow: var(--shadow); cursor: pointer; }
 .nc b { display: block; }
 .nc span { color: var(--muted); font-size: 14px; }
@@ -827,6 +839,7 @@ if (TG) {
   // во весь экран на телефонах (Telegram 8.0+), и чтобы свайп вниз не закрывал приложение посреди задания
   try { if (tgv("8.0") && /^(ios|android)/.test(TG.platform || "")) TG.requestFullscreen(); } catch (e) {}
   try { if (tgv("7.7")) TG.disableVerticalSwipes(); } catch (e) {}
+  try { var sp = TG.initDataUnsafe && TG.initDataUnsafe.start_param; if (sp) track(sp === "ref" ? "from_invite" : "from_link", "Источник", sp); } catch (e) {}
   try { if (TG.colorScheme) document.documentElement.setAttribute("data-theme", TG.colorScheme); } catch (e) {}
 }
 function haptic(kind) {
@@ -844,6 +857,22 @@ function track(goal, label, detail) {
     window.ym(113082059, "reachGoal", goal);
     if (label) { var p = {}; p[label] = {}; p[label][detail] = 1; window.ym(113082059, "params", p); }
   } catch (e) {}
+}
+/* «Подарить билет другу»: открывает выбор чата в Telegram с приглашением */
+var INVITE_LINK = "https://t.me/English_krug_bot?startapp=ref";
+function ticketHtml() {
+  var CUR = curCountry();
+  return '<div class="ticket" aria-hidden="true"><div class="tk-main"><div class="tk-top"><span>Посадочный</span><span>KRG 001</span></div>' +
+    '<div class="tk-route"><div><b>ДОМ</b><small>ваш город</small></div><div class="plane">✈</div><div><b>' + (CUR.id === "us" ? "NYC" : "LON") + '</b><small>' + CUR.city + '</small></div></div>' +
+    '<div class="tk-info"><div>Пассажир<b>Ваш друг</b></div><div>Класс<b>Бизнес</b></div><div>Цена<b>0 ₽</b></div></div></div>' +
+    '<div class="tk-stub"><span>Место</span><b>1A</b><span>🎟</span></div></div>';
+}
+function shareInvite(place) {
+  var text = "✈️ Дарю тебе билет в «Кругосветку по английскому»! Подтянем английский к поездке: знакомства, такси, аренда машины — по 10 минут в день прямо в Telegram.";
+  var url = "https://t.me/share/url?url=" + encodeURIComponent(INVITE_LINK) + "&text=" + encodeURIComponent(text);
+  track("share", "Поделился билетом", place);
+  try { if (TG && TG.openTelegramLink) { TG.openTelegramLink(url); return; } } catch (e) {}
+  window.open(url, "_blank");
 }
 function userName() { try { var u = TG && TG.initDataUnsafe && TG.initDataUnsafe.user; return u && u.first_name ? u.first_name : ""; } catch (e) { return ""; } }
 
@@ -1210,6 +1239,7 @@ function renderMap() {
   var cOpen = allDone && !state.visas[CC.id];
   h += '<button class="stop customs' + (allDone ? "" : " locked") + '" data-a="customs"' + (cOpen ? "" : " disabled") + '><span class="dot">' + (state.visas[CC.id] ? "✓" : "🛂") + "</span><span><b>Таможня</b><small>" +
  (state.visas[CC.id] ? "Виза в паспорте" : allDone ? "Проверка страны: 15 заданий" : "Откроется после 10 ситуаций") + "</small></span></button></div>";
+  h += '<h3 class="section-t">Путешествовать веселее вдвоём</h3>' + ticketHtml() + '<button class="btn gold small" data-a="share" data-v="home">🎟 Подарить билет другу</button>';
   h += '<h3 class="section-t">Дальше по маршруту</h3><div class="next-countries">' + C.countries.slice(C.countries.indexOf(CUR) + 1).map(function (c) {
     return '<div class="nc"><span class="flag" aria-hidden="true">' + c.flag + "</span><div><b>" + c.name + "</b><span>" + c.theme + '</span></div><span class="soon">' + (c.situations ? "после визы" : "скоро") + '</span></div>';
   }).join("") + "</div>";
@@ -1486,7 +1516,8 @@ function renderResult() {
   h += '<div class="stats"><div class="stat gold"><b data-count="' + r.xp + '">0</b><span>очков</span></div><div class="stat mint"><b>' + r.acc + '%</b><span>точность</span></div><div class="stat blue"><b>' + r.best + "</b><span>верных подряд</span></div></div>";
   if (r.goalNow) h += '<div class="goal-done"><span aria-hidden="true">🔥</span><div>Цель дня выполнена<br><small style="font-weight:500">Дней подряд: ' + streakNow() + "</small></div></div>";
   if (r.kind === "sit" && r.extra.first) h += '<h3 class="section-t">Новая марка</h3><div class="slam">' + stampHtml(r.sit) + "</div>";
-  return h + '<button class="btn" data-a="done">Продолжить</button></div>';
+  var shareBtn = (r.kind === "customs" && r.extra.passed) || (r.kind === "sit" && r.extra.first) ? '<button class="btn quiet small" data-a="share" data-v="' + (r.kind === "customs" ? "visa" : "sit") + '" style="margin-bottom:12px">🎟 Позвать друга в путешествие</button>' : "";
+  return h + shareBtn + '<button class="btn" data-a="done">Продолжить</button></div>';
 }
 function countUp() {
   var el = app.querySelector("[data-count]"); if (!el) return;
@@ -1567,6 +1598,7 @@ document.addEventListener("click", function (e) {
     case "retest": startTest(); break;
     case "tab": view = v; haptic(); render(); window.scrollTo(0, 0); break;
     case "country": viewCid = v || null; haptic(); render(); window.scrollTo(0, 0); break;
+    case "share": shareInvite(v || "home"); break;
     case "sit": startSit(v); break;
     case "customs": startCustoms(); break;
     case "customs-go": s.phase = "quiz"; render(); autoSpeak(); break;

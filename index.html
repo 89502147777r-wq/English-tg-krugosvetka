@@ -164,6 +164,10 @@ h1, h2, h3, p { margin: 0; }
 .next-countries { display: grid; gap: 10px; }
 .nc { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); }
 .nc .flag { font-size: 34px; line-height: 1; filter: saturate(0.6); }
+button.nc { width: 100%; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+button.nc .flag { filter: none; }
+.nc .got { margin-left: auto; font-size: 12px; font-weight: 700; color: #fff; background: var(--mint, #139A63); border-radius: 10px; padding: 5px 9px; white-space: nowrap; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 12px; padding: 8px 12px; border: 0; border-radius: 12px; background: var(--card); color: var(--blue); font: inherit; font-weight: 700; box-shadow: var(--shadow); cursor: pointer; }
 .nc b { display: block; }
 .nc span { color: var(--muted); font-size: 14px; }
 .nc .soon { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--muted); border: 2px dashed var(--line); border-radius: 10px; padding: 4px 8px; white-space: nowrap; }
@@ -1060,6 +1064,7 @@ function sceneUK() {
 /* ================= Экраны ================= */
 var app = document.getElementById("app"), overlay = document.getElementById("overlay");
 var view = state.onboarded ? "map" : "ob";
+var viewCid = null; // страна, открытая на главном экране (пройденную можно пересмотреть)
 var obStep = 0, session = null, result = null, dialog = null, test = null;
 
 function render() {
@@ -1151,15 +1156,16 @@ function ringSvg(v, max) {
   return '<svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="track" cx="24" cy="24" r="' + r + '"/><circle class="val" cx="24" cy="24" r="' + r + '" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - p)).toFixed(1) + '"/></svg>';
 }
 function renderMap() {
-  var CC = curCountry(), name = userName(), s = streakNow(), tx = todayXp(), n = doneSits(CC), next = nextSit(CC), due = dueWords();
+  var CUR = curCountry(), CC = (viewCid && PLAY.filter(function (c) { return c.id === viewCid; })[0]) || CUR, name = userName(), s = streakNow(), tx = todayXp(), n = doneSits(CC), next = nextSit(CC), due = dueWords();
   var h = '<header class="top"><div class="hello">' + (name ? "Привет, " + esc(name) + "!" : "Привет!") + "</div>" +
     '<span class="chip' + (s ? "" : " off") + '" style="color:' + (s ? "var(--red)" : "") + '" title="Дней подряд">' + I.flame + s + '</span><span class="chip" style="color:var(--gold)" title="Очки">' + I.star + state.xp + "</span></header>";
   h += '<div class="goal">' + ringSvg(tx, state.goal) + "<div><b>" + (tx >= state.goal ? "Цель дня выполнена" : "Цель дня: " + tx + " из " + state.goal) + "</b><span>" +
     (tx >= state.goal ? "Серия продлена, можно продолжать" : "Осталось " + (state.goal - tx) + " " + plural(state.goal - tx, "очко", "очка", "очков")) + "</span></div></div>";
+  if (CC !== CUR) h += '<button class="back-link" data-a="country" data-v="">← К текущей стране: ' + CUR.flag + " " + CUR.name + "</button>";
   h += '<article class="airmail country"><div class="inner">' + sceneArt({ id: CC.id }) + '<div class="cap"><b>' + CC.flag + " " + CC.name + "</b><span>" + CC.city + '</span></div><div class="sub">' + CC.theme + ". Пройдено " + n + " из 10 ситуаций</div>" +
     '<div class="progress-line"><i style="width:' + (n * 10) + '%"></i></div>' +
     (next ? '<button class="btn" data-a="sit" data-v="' + next.id + '">Ситуация ' + (next.index + 1) + ": " + esc(next.title) + "</button>"
-          : state.visas[CC.id] ? '<button class="btn quiet" disabled>Виза получена, следующая страна скоро</button>'
+          : state.visas[CC.id] ? (CC !== CUR ? '<button class="btn" data-a="country" data-v="">Виза получена ✓ Дальше: ' + CUR.flag + " " + CUR.name + "</button>" : '<button class="btn quiet" disabled>Виза получена, следующая страна скоро</button>')
           : '<button class="btn gold" data-a="customs">Пройти таможню</button>') + "</div></article>";
   if (due.length) h += '<button class="review" data-a="review"><span>Повторить слова<small>Пора освежить, пока не забылись</small></span><span class="n">' + Math.min(due.length, 12) + "</span></button>";
   h += '<h3 class="section-t">Маршрут по ' + CC.gen + '</h3><div class="route">';
@@ -1169,9 +1175,14 @@ function renderMap() {
       "</b><small>" + (done ? "Пройдено, точность " + state.sit[st.id].best + "%" : cur ? "Следующая остановка" : "8 слов, 3 фразы, диалог") + "</small></span></button>";
   });
   var allDone = n === 10;
-  h += '<button class="stop customs' + (allDone ? "" : " locked") + '" data-a="customs"' + (allDone ? "" : " disabled") + '><span class="dot">' + (state.visas[CC.id] ? "✓" : "🛂") + "</span><span><b>Таможня</b><small>" +
+  var cOpen = allDone && !state.visas[CC.id];
+  h += '<button class="stop customs' + (allDone ? "" : " locked") + '" data-a="customs"' + (cOpen ? "" : " disabled") + '><span class="dot">' + (state.visas[CC.id] ? "✓" : "🛂") + "</span><span><b>Таможня</b><small>" +
  (state.visas[CC.id] ? "Виза в паспорте" : allDone ? "Проверка страны: 15 заданий" : "Откроется после 10 ситуаций") + "</small></span></button></div>";
-  h += '<h3 class="section-t">Дальше по маршруту</h3><div class="next-countries">' + C.countries.slice(C.countries.indexOf(CC) + 1).map(function (c) {
+  var passed = PLAY.filter(function (c) { return state.visas[c.id] && c !== CC; });
+  if (passed.length) h += '<h3 class="section-t">Пройденные страны</h3><div class="next-countries">' + passed.map(function (c) {
+    return '<button class="nc" data-a="country" data-v="' + c.id + '"><span class="flag" aria-hidden="true">' + c.flag + "</span><div><b>" + c.name + "</b><span>" + c.theme + "</span></div>" + '<span class="got">Виза ✓</span></button>';
+  }).join("") + "</div>";
+  h += '<h3 class="section-t">Дальше по маршруту</h3><div class="next-countries">' + C.countries.slice(C.countries.indexOf(CUR) + 1).map(function (c) {
     return '<div class="nc"><span class="flag" aria-hidden="true">' + c.flag + "</span><div><b>" + c.name + "</b><span>" + c.theme + '</span></div><span class="soon">' + (c.situations ? "после визы" : "скоро") + '</span></div>';
   }).join("") + "</div>";
   return h;
@@ -1523,6 +1534,7 @@ document.addEventListener("click", function (e) {
     case "test-done": test = null; view = "map"; render(); window.scrollTo(0, 0); break;
     case "retest": startTest(); break;
     case "tab": view = v; haptic(); render(); window.scrollTo(0, 0); break;
+    case "country": viewCid = v || null; haptic(); render(); window.scrollTo(0, 0); break;
     case "sit": startSit(v); break;
     case "customs": startCustoms(); break;
     case "customs-go": s.phase = "quiz"; render(); autoSpeak(); break;

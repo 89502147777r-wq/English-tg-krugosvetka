@@ -9,6 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Rubik:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- Яндекс Метрика: анонимная статистика шагов (без имён и данных Telegram) -->
+<script>
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();
+for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
+k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+try { ym(113082059, "init", { clickmap: true, trackLinks: true, accurateTrackBounce: true }); } catch (e) {}
+</script>
 <style>
 :root {
   --bg: #EEF2FF; --card: #FFFFFF; --ink: #141B4D; --muted: #5B6390; --line: #D5DBF5;
@@ -829,6 +837,14 @@ function haptic(kind) {
     else TG.HapticFeedback.impactOccurred("light");
   } catch (e) {}
 }
+/* Статистика: цель в Метрике + параметр визита, чтобы видеть, какие ситуации проходят */
+function track(goal, label, detail) {
+  try {
+    if (typeof window.ym !== "function") return;
+    window.ym(113082059, "reachGoal", goal);
+    if (label) { var p = {}; p[label] = {}; p[label][detail] = 1; window.ym(113082059, "params", p); }
+  } catch (e) {}
+}
 function userName() { try { var u = TG && TG.initDataUnsafe && TG.initDataUnsafe.user; return u && u.first_name ? u.first_name : ""; } catch (e) { return ""; } }
 
 /* ================= Содержание ================= */
@@ -1145,6 +1161,7 @@ function finishTest() {
   test.knownEn.forEach(function (en) { if (WORDS[en]) state.words[en] = { b: 2, d: d + INTERVALS[2] }; });
   var label = k <= 6 ? "Начинаем с основ" : k <= 13 ? "Школьная база есть" : "Уверенная база";
   state.placed = { k: k, label: label };
+  track("test_done", "Тест уровня", label);
   state.onboarded = true; save();
   test.done = true; render();
 }
@@ -1221,6 +1238,7 @@ function renderPassport() {
 function startSit(id) {
   var s = sitById(id);
   var learn = s.words.filter(function (w) { return !known(w.en); });
+  track("sit_start", "Начал ситуацию", s.id + " " + s.title);
   session = { kind: "sit", sit: s, phase: "scene", learn: learn, knownWords: s.words.filter(function (w) { return known(w.en); }), idx: 0, flipped: false, dstep: 0, dlog: [], dwrong: false };
   haptic(); render(); window.scrollTo(0, 0);
 }
@@ -1238,6 +1256,7 @@ function startCustoms() {
 function startReview() {
   var due = pick(dueWords(), 12).map(function (k) { return WORDS[k]; });
   if (!due.length) return;
+  track("review_start");
   session = { kind: "review", phase: "quiz", words: due, items: buildItems(due, false) };
   resetQuiz(); haptic(); render(); autoSpeak();
 }
@@ -1431,10 +1450,12 @@ function finish() {
   });
   var bonus = s.kind === "sit" ? 20 : s.kind === "customs" ? 30 : 10;
   var xp = s.xp + bonus, goalNow = addXp(xp), extra = {};
-  if (s.kind === "sit") { var prev = state.sit[s.sit.id]; extra.first = !prev; state.sit[s.sit.id] = { best: Math.max(prev ? prev.best : 0, acc) }; }
+  if (s.kind === "sit") { var prev = state.sit[s.sit.id]; extra.first = !prev; state.sit[s.sit.id] = { best: Math.max(prev ? prev.best : 0, acc) };
+    track("sit_done", "Прошёл ситуацию", s.sit.id + " " + s.sit.title); }
   if (s.kind === "customs") {
     extra.passed = s.correct >= 12;
     if (extra.passed) state.visas[s.country.id] = d; else state.customsTry[s.country.id] = d;
+    track(extra.passed ? "customs_pass" : "customs_fail", "Таможня", s.country.name + (extra.passed ? ": виза" : ": не сдал"));
     extra.correct = s.correct; extra.total = s.items.length;
   }
   save();
@@ -1527,7 +1548,7 @@ document.addEventListener("click", function (e) {
     case "ob-next": obStep = Math.min(2, obStep + 1); haptic(); render(); break;
     case "ob-goal": state.goal = +v; render(); break;
     case "test-start": startTest(); break;
-    case "test-skip": state.onboarded = true; state.placed = state.placed || null; save(); view = "map"; render(); break;
+    case "test-skip": track("test_skip"); state.onboarded = true; state.placed = state.placed || null; save(); view = "map"; render(); break;
     case "t-yes": {
       var item = C.placement[test.i];
       var pool = shuffle(C.placement.filter(function (x) { return x[0] !== item[0]; })).slice(0, 3).map(function (x) { return x[1]; });

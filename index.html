@@ -19,8 +19,11 @@
   --font-ui: "Rubik", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-word: "Fraunces", Georgia, "Times New Roman", serif;
   box-sizing: border-box;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* в полноэкранном режиме Telegram отдаёт свои отступы: вырез экрана + свои кнопки «закрыть» и «…» */
+  --sat: calc(max(env(safe-area-inset-top, 0px), var(--tg-safe-area-inset-top, 0px)) + var(--tg-content-safe-area-inset-top, 0px));
+  --sab: max(env(safe-area-inset-bottom, 0px), var(--tg-safe-area-inset-bottom, 0px));
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -166,7 +169,7 @@ h1, h2, h3, p { margin: 0; }
 .nc .soon { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--muted); border: 2px dashed var(--line); border-radius: 10px; padding: 4px 8px; white-space: nowrap; }
 
 /* нижнее меню */
-.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; padding: 10px 16px calc(10px + var(--sab));
   background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--line); }
 .nav div { max-width: 480px; margin: 0 auto; display: flex; gap: 8px; }
 .nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px; border-radius: 14px; color: var(--muted); font-size: 13px; font-weight: 500; }
@@ -283,7 +286,7 @@ h1, h2, h3, p { margin: 0; }
 .tile.w { font-size: 19px; }
 .tile.used { visibility: hidden; }
 
-.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); border-radius: 24px 24px 0 0; animation: sheetUp 0.28s cubic-bezier(.2,.9,.3,1.1) both; }
+.sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 18px 16px calc(18px + var(--sab)); border-radius: 24px 24px 0 0; animation: sheetUp 0.28s cubic-bezier(.2,.9,.3,1.1) both; }
 .sheet > div { max-width: 480px; margin: 0 auto; }
 .sheet.ok { background: var(--mint-soft); }
 .sheet.bad { background: var(--err-soft); }
@@ -294,7 +297,7 @@ h1, h2, h3, p { margin: 0; }
 .sheet .ans { font-family: var(--font-word); font-weight: 700; font-size: 20px; }
 @keyframes sheetUp { from { transform: translateY(100%); } }
 .scrim { position: fixed; inset: 0; z-index: 30; background: rgba(10, 14, 40, 0.45); display: grid; align-items: end; }
-.dialog { background: var(--card); border-radius: 24px 24px 0 0; padding: 22px 16px calc(18px + env(safe-area-inset-bottom, 0px)); animation: sheetUp 0.25s ease-out both; }
+.dialog { background: var(--card); border-radius: 24px 24px 0 0; padding: 22px 16px calc(18px + var(--sab)); animation: sheetUp 0.25s ease-out both; }
 .dialog > div { max-width: 480px; margin: 0 auto; display: grid; gap: 10px; }
 .dialog h3 { font-size: 20px; font-weight: 800; }
 .dialog p { color: var(--muted); margin-bottom: 6px; }
@@ -365,14 +368,14 @@ h1, h2, h3, p { margin: 0; }
 
 <script>
 /* Содержание «Кругосветки по английскому».
-   Страна 1 (Великобритания) заполнена полностью, страны 2–6 — только названия ситуаций.
+   Страны 1–2 (Великобритания, США) заполнены полностью, страны 3–6 — только названия ситуаций.
    Формат слова: [английское, транскрипция, перевод, пример, перевод примера].
    Формат фразы: [английская фраза, перевод].
    Диалог: реплики собеседника и выбор ответа; правильный вариант всегда первый в списке,
    при показе варианты перемешиваются. */
 window.CONTENT = {
   countries: [
-    { id: "uk", flag: "🇬🇧", name: "Великобритания", city: "Лондон", theme: "Знакомство и общение", situations: [
+    { id: "uk", flag: "🇬🇧", name: "Великобритания", gen: "Великобритании", done: "Великобритания пройдена", city: "Лондон", theme: "Знакомство и общение", situations: [
       { id: "uk1", title: "Привет и знакомство", npc: "Том", scene: "Вечеринка у друзей в Лондоне. К вам подходит Том.",
         words: [
           ["hello", "həˈləʊ", "привет, здравствуйте", "Hello, how are you?", "Здравствуйте, как дела?"],
@@ -574,7 +577,208 @@ window.CONTENT = {
           { say: "Of course! Come and visit us again.", ru: "Конечно! Приезжайте к нам снова.", options: ["Thanks! See you soon. Take care!", "I'm busy on Monday.", "What's the weather like?"] }
         ] }
     ] },
-    { id: "us", flag: "🇺🇸", name: "США", city: "Нью-Йорк", theme: "Город и транспорт", titles: ["Спросить дорогу", "Метро и автобус", "Такси", "Аренда машины и заправка", "Банк и банкомат", "Почта и посылки", "Парикмахерская", "Музеи и достопримечательности", "Кино и развлечения", "Спортзал"] },
+    { id: "us", flag: "🇺🇸", name: "США", gen: "США", done: "США пройдены", city: "Нью-Йорк", theme: "Город и транспорт", situations: [
+      { id: "us1", title: "Спросить дорогу", npc: "Майк", scene: "Манхэттен. Вы ищете Центральный парк и спрашиваете дорогу у мужчины с собакой.",
+        words: [
+          ["street", "striːt", "улица", "Walk down this street.", "Идите по этой улице."],
+          ["corner", "ˈkɔːnə", "угол", "The café is on the corner.", "Кафе на углу."],
+          ["left", "left", "налево, левый", "Turn left at the bank.", "Поверните налево у банка."],
+          ["right", "raɪt", "направо, правый", "The park is on the right.", "Парк справа."],
+          ["straight", "streɪt", "прямо", "Go straight ahead.", "Идите прямо."],
+          ["block", "blɒk", "квартал", "Walk one more block.", "Пройдите ещё один квартал."],
+          ["far", "fɑː", "далеко", "My hotel is not far.", "Мой отель недалеко."],
+          ["near", "nɪə", "рядом, близко", "Is there a bank near here?", "Здесь рядом есть банк?"]
+        ],
+        phrases: [
+          ["Excuse me, how do I get to Central Park?", "Простите, как пройти к Центральному парку?"],
+          ["Is it far from here?", "Это далеко отсюда?"],
+          ["Go straight and turn left.", "Идите прямо и поверните налево."]
+        ],
+        dialog: [
+          { say: "Hi! Are you lost?", ru: "Привет! Заблудились?", options: ["Yes. How do I get to Central Park?", "I'm fine, thank you.", "It's half past six."] },
+          { say: "Go straight for two blocks, then turn left.", ru: "Идите прямо два квартала, потом налево.", options: ["Thanks! Is it far from here?", "I have two children.", "See you on Monday."] }
+        ] },
+      { id: "us2", title: "Метро и автобус", npc: "Сотрудник метро", scene: "Станция метро в Нью-Йорке. Вы не понимаете, как купить проезд.",
+        words: [
+          ["subway", "ˈsʌbweɪ", "метро (в США)", "Let's take the subway.", "Поедем на метро."],
+          ["ticket", "ˈtɪkɪt", "билет", "I need a ticket.", "Мне нужен билет."],
+          ["bus", "bʌs", "автобус", "The bus is late.", "Автобус опаздывает."],
+          ["stop", "stɒp", "остановка", "Where is the nearest stop?", "Где ближайшая остановка?"],
+          ["line", "laɪn", "линия, ветка", "Take the red line.", "Поезжайте по красной ветке."],
+          ["change", "tʃeɪndʒ", "пересаживаться; менять", "Change at the next station.", "Пересядьте на следующей станции."],
+          ["station", "ˈsteɪʃn", "станция, вокзал", "Which station is it?", "Какая это станция?"],
+          ["card", "kɑːd", "карта, карточка", "Can I pay by card?", "Можно оплатить картой?"]
+        ],
+        phrases: [
+          ["Which line goes to Brooklyn?", "Какая ветка идёт в Бруклин?"],
+          ["Where do I change?", "Где мне пересесть?"],
+          ["How much is a ticket?", "Сколько стоит билет?"]
+        ],
+        dialog: [
+          { say: "Can I help you?", ru: "Вам помочь?", options: ["Yes, please. How much is a ticket?", "Take care!", "My sister is older."] },
+          { say: "It's about three dollars. You can pay by card.", ru: "Около трёх долларов. Можно оплатить картой.", options: ["Great! Which line goes to Brooklyn?", "It's cold and cloudy.", "Nice to meet you too."] }
+        ] },
+      { id: "us3", title: "Такси", npc: "Карлос", scene: "Аэропорт Кеннеди. Вы садитесь в жёлтое такси до отеля.",
+        words: [
+          ["taxi", "ˈtæksi", "такси", "Let's take a taxi.", "Давайте возьмём такси."],
+          ["address", "əˈdres", "адрес", "Here is the address.", "Вот адрес."],
+          ["drive", "draɪv", "везти, водить машину", "Please drive slowly.", "Пожалуйста, езжайте медленнее."],
+          ["minute", "ˈmɪnɪt", "минута", "Wait a minute, please.", "Подождите минуту, пожалуйста."],
+          ["traffic", "ˈtræfɪk", "пробки, движение", "There is a lot of traffic today.", "Сегодня большие пробки."],
+          ["airport", "ˈeəpɔːt", "аэропорт", "Take me to the airport.", "Отвезите меня в аэропорт."],
+          ["tip", "tɪp", "чаевые", "Here is your tip.", "Вот ваши чаевые."],
+          ["trunk", "trʌŋk", "багажник (в США)", "Put the bag in the trunk.", "Положите сумку в багажник."]
+        ],
+        phrases: [
+          ["Can you take me to this address?", "Можете отвезти меня по этому адресу?"],
+          ["How long does it take?", "Сколько времени ехать?"],
+          ["Keep the change.", "Сдачи не надо."]
+        ],
+        dialog: [
+          { say: "Hi! Where to?", ru: "Здравствуйте! Куда едем?", options: ["Can you take me to this address?", "I'm from a small town.", "I enjoy cooking."] },
+          { say: "Sure. It's about forty minutes with this traffic.", ru: "Конечно. С такими пробками минут сорок.", options: ["Okay, no problem. Thank you.", "Pizza is my favourite food.", "Turn left at the bank."] }
+        ] },
+      { id: "us4", title: "Аренда машины и заправка", npc: "Линда", scene: "Прокат машин в Нью-Джерси. Вы берёте машину на три дня.",
+        words: [
+          ["car", "kɑː", "машина, автомобиль", "I want to rent a car.", "Я хочу арендовать машину."],
+          ["rent", "rent", "арендовать, брать напрокат", "We rent a flat in the city.", "Мы снимаем квартиру в городе."],
+          ["license", "ˈlaɪsns", "права, лицензия", "Can I see your driver's license?", "Можно ваши водительские права?"],
+          ["gas", "ɡæs", "бензин (в США)", "We need gas.", "Нам нужен бензин."],
+          ["tank", "tæŋk", "бак", "Fill the tank, please.", "Заправьте полный бак, пожалуйста."],
+          ["full", "fʊl", "полный", "The bus is full.", "Автобус полный."],
+          ["key", "kiː", "ключ", "Here is your key.", "Вот ваш ключ."],
+          ["return", "rɪˈtɜːn", "возвращать", "Return the car on Friday.", "Верните машину в пятницу."]
+        ],
+        phrases: [
+          ["I'd like to rent a car for three days.", "Я хотел бы арендовать машину на три дня."],
+          ["Where is the nearest gas station?", "Где ближайшая заправка?"],
+          ["Should I return it with a full tank?", "Вернуть её с полным баком?"]
+        ],
+        dialog: [
+          { say: "Hello! How can I help you?", ru: "Здравствуйте! Чем могу помочь?", options: ["I'd like to rent a car for three days.", "Nice to meet you too.", "It's sunny today."] },
+          { say: "Sure. Can I see your driver's license?", ru: "Конечно. Можно ваши водительские права?", options: ["Yes, here you are.", "Go straight and turn left.", "I'm busy on Saturday."] }
+        ] },
+      { id: "us5", title: "Банк и банкомат", npc: "Джеймс", scene: "Банкомат забрал вашу карту. Вы заходите в отделение банка.",
+        words: [
+          ["bank", "bæŋk", "банк", "The bank opens at nine.", "Банк открывается в девять."],
+          ["money", "ˈmʌni", "деньги", "I need some money.", "Мне нужно немного денег."],
+          ["cash", "kæʃ", "наличные", "Do you take cash?", "Вы принимаете наличные?"],
+          ["account", "əˈkaʊnt", "счёт в банке", "I want to open an account.", "Я хочу открыть счёт."],
+          ["dollar", "ˈdɒlə", "доллар", "It costs one dollar.", "Это стоит один доллар."],
+          ["machine", "məˈʃiːn", "автомат, аппарат", "The machine took my card.", "Автомат забрал мою карту."],
+          ["pay", "peɪ", "платить", "Can I pay later?", "Можно заплатить позже?"],
+          ["exchange", "ɪksˈtʃeɪndʒ", "обменивать; обмен", "Where can I exchange money?", "Где можно обменять деньги?"]
+        ],
+        phrases: [
+          ["The ATM took my card.", "Банкомат забрал мою карту."],
+          ["I'd like to exchange money.", "Я хотел бы обменять деньги."],
+          ["Can I pay in cash?", "Можно заплатить наличными?"]
+        ],
+        dialog: [
+          { say: "Good morning! What can I do for you?", ru: "Доброе утро! Чем могу помочь?", options: ["The ATM took my card.", "I have two children.", "Let's keep in touch!"] },
+          { say: "I'm sorry. Can I see your passport, please?", ru: "Сочувствую. Можно ваш паспорт?", options: ["Of course. Here you are.", "It's two blocks away.", "I enjoy reading."] }
+        ] },
+      { id: "us6", title: "Почта и посылки", npc: "Сара", scene: "Почтовое отделение в Бруклине. Вы отправляете посылку домой.",
+        words: [
+          ["mail", "meɪl", "почта (в США)", "Is there any mail for me?", "Для меня есть почта?"],
+          ["package", "ˈpækɪdʒ", "посылка", "I want to send a package.", "Я хочу отправить посылку."],
+          ["send", "send", "отправлять", "Send me a photo.", "Пришлите мне фото."],
+          ["letter", "ˈletə", "письмо", "I got a letter from my mother.", "Я получил письмо от мамы."],
+          ["stamp", "stæmp", "марка", "I need a stamp.", "Мне нужна марка."],
+          ["box", "bɒks", "коробка", "Put the books in a box.", "Положите книги в коробку."],
+          ["heavy", "ˈhevi", "тяжёлый", "This bag is very heavy.", "Эта сумка очень тяжёлая."],
+          ["deliver", "dɪˈlɪvə", "доставлять", "We deliver on Sundays.", "Мы доставляем по воскресеньям."]
+        ],
+        phrases: [
+          ["I want to send this package home.", "Я хочу отправить эту посылку домой."],
+          ["How long does delivery take?", "Сколько идёт доставка?"],
+          ["How much does it cost?", "Сколько это стоит?"]
+        ],
+        dialog: [
+          { say: "Next, please! What are you sending?", ru: "Следующий! Что отправляете?", options: ["I want to send this package home.", "It's freezing today.", "I work from home."] },
+          { say: "OK. It's heavy. It will cost forty dollars.", ru: "Хорошо. Она тяжёлая, будет стоить сорок долларов.", options: ["How long does delivery take?", "My husband cooks dinner.", "Take the red line."] }
+        ] },
+      { id: "us7", title: "Парикмахерская", npc: "Тони", scene: "Барбершоп в Нью-Йорке. Пора подстричься.",
+        words: [
+          ["hair", "heə", "волосы", "You have nice hair.", "У вас красивые волосы."],
+          ["haircut", "ˈheəkʌt", "стрижка", "I need a haircut.", "Мне нужна стрижка."],
+          ["short", "ʃɔːt", "короткий", "The film is short.", "Фильм короткий."],
+          ["long", "lɒŋ", "длинный, долго", "My hair is too long.", "У меня слишком длинные волосы."],
+          ["cut", "kʌt", "резать, стричь", "Can you cut my hair?", "Можете меня подстричь?"],
+          ["side", "saɪd", "бок, сторона", "Park on this side of the street.", "Паркуйтесь на этой стороне улицы."],
+          ["top", "tɒp", "верх, верхушка", "Leave it longer on top.", "Оставьте длиннее сверху."],
+          ["appointment", "əˈpɔɪntmənt", "запись к мастеру или врачу", "I have an appointment at five.", "У меня запись на пять."]
+        ],
+        phrases: [
+          ["Just a little shorter, please.", "Чуть короче, пожалуйста."],
+          ["Short on the sides, longer on top.", "Коротко по бокам, длиннее сверху."],
+          ["Do I need an appointment?", "Нужно записываться заранее?"]
+        ],
+        dialog: [
+          { say: "Hey! What are we doing today?", ru: "Привет! Что делаем сегодня?", options: ["Just a little shorter, please.", "Take me to the airport.", "It's two blocks away."] },
+          { say: "No problem. Short on the sides?", ru: "Без проблем. По бокам коротко?", options: ["Yes, and a little longer on top.", "Can I pay by card?", "See you tomorrow!"] }
+        ] },
+      { id: "us8", title: "Музеи и достопримечательности", npc: "Рейчел", scene: "Метрополитен-музей. Вы покупаете билеты и спрашиваете про экскурсию.",
+        words: [
+          ["museum", "mjuˈziːəm", "музей", "The museum is closed on Monday.", "По понедельникам музей закрыт."],
+          ["open", "ˈəʊpən", "открытый; открывать", "Is the shop open today?", "Магазин сегодня открыт?"],
+          ["closed", "kləʊzd", "закрытый", "The bank is closed.", "Банк закрыт."],
+          ["tour", "tʊə", "экскурсия", "The tour starts at ten.", "Экскурсия начинается в десять."],
+          ["guide", "ɡaɪd", "гид, экскурсовод", "Our guide speaks Russian.", "Наш гид говорит по-русски."],
+          ["photo", "ˈfəʊtəʊ", "фото", "Can I take a photo?", "Можно сфотографировать?"],
+          ["famous", "ˈfeɪməs", "знаменитый", "This is a famous painting.", "Это знаменитая картина."],
+          ["entrance", "ˈentrəns", "вход", "Where is the entrance?", "Где вход?"]
+        ],
+        phrases: [
+          ["Two tickets, please.", "Два билета, пожалуйста."],
+          ["What time does the tour start?", "Во сколько начинается экскурсия?"],
+          ["Can I take photos here?", "Здесь можно фотографировать?"]
+        ],
+        dialog: [
+          { say: "Hi there! How many tickets?", ru: "Здравствуйте! Сколько билетов?", options: ["Two tickets, please.", "I'm from a small town.", "The tank is full."] },
+          { say: "Here you go. Would you like a tour?", ru: "Держите. Хотите экскурсию?", options: ["Yes! What time does the tour start?", "My hair is too long.", "Is there any mail for me?"] }
+        ] },
+      { id: "us9", title: "Кино и развлечения", npc: "Джейк", scene: "Вечер пятницы. Друг Джейк зовёт вас в кино.",
+        words: [
+          ["movie", "ˈmuːvi", "фильм (в США)", "Let's see a movie.", "Давай сходим в кино."],
+          ["watch", "wɒtʃ", "смотреть", "I watch TV every evening.", "Я смотрю телевизор каждый вечер."],
+          ["seat", "siːt", "место, сиденье", "Is this seat free?", "Это место свободно?"],
+          ["show", "ʃəʊ", "шоу, сеанс; показывать", "The show starts at eight.", "Шоу начинается в восемь."],
+          ["funny", "ˈfʌni", "смешной", "My brother is very funny.", "Мой брат очень смешной."],
+          ["boring", "ˈbɔːrɪŋ", "скучный", "The film was boring.", "Фильм был скучным."],
+          ["popcorn", "ˈpɒpkɔːn", "попкорн", "I love popcorn.", "Я люблю попкорн."],
+          ["tonight", "təˈnaɪt", "сегодня вечером", "What are you doing tonight?", "Что ты делаешь сегодня вечером?"]
+        ],
+        phrases: [
+          ["Do you want to see a movie tonight?", "Хочешь сходить в кино сегодня вечером?"],
+          ["Two tickets for the eight o'clock show.", "Два билета на восьмичасовой сеанс."],
+          ["It was really funny!", "Было очень смешно!"]
+        ],
+        dialog: [
+          { say: "Hey! Do you want to see a movie tonight?", ru: "Привет! Хочешь сходить в кино вечером?", options: ["Sure! What time is the show?", "Change at the next station.", "Fill the tank, please."] },
+          { say: "At eight. I heard it's really funny.", ru: "В восемь. Говорят, очень смешной.", options: ["Great! Let's get popcorn too.", "The box is heavy.", "I need a haircut."] }
+        ] },
+      { id: "us10", title: "Спортзал", npc: "Кейт", scene: "Фитнес-клуб рядом с отелем. Вы хотите купить абонемент.",
+        words: [
+          ["gym", "dʒɪm", "спортзал", "I go to the gym on Mondays.", "Я хожу в спортзал по понедельникам."],
+          ["exercise", "ˈeksəsaɪz", "упражнение; заниматься спортом", "This exercise is hard.", "Это упражнение трудное."],
+          ["hard", "hɑːd", "трудный; усердно", "Don't work too hard.", "Не перетруждайтесь."],
+          ["easy", "ˈiːzi", "лёгкий", "The first class is easy.", "Первое занятие лёгкое."],
+          ["run", "rʌn", "бегать", "I run every morning.", "Я бегаю каждое утро."],
+          ["towel", "ˈtaʊəl", "полотенце", "Can I have a towel?", "Можно полотенце?"],
+          ["membership", "ˈmembəʃɪp", "абонемент, членство", "How much is a membership?", "Сколько стоит абонемент?"],
+          ["trainer", "ˈtreɪnə", "тренер", "My trainer is very strict.", "Мой тренер очень строгий."]
+        ],
+        phrases: [
+          ["How much is a monthly membership?", "Сколько стоит абонемент на месяц?"],
+          ["Can I try one class for free?", "Можно одно занятие попробовать бесплатно?"],
+          ["Where is the locker room?", "Где раздевалка?"]
+        ],
+        dialog: [
+          { say: "Welcome! Are you new here?", ru: "Добро пожаловать! Вы здесь впервые?", options: ["Yes. How much is a monthly membership?", "Two tickets, please.", "The ATM took my card."] },
+          { say: "It's sixty dollars. You can try one class for free.", ru: "Шестьдесят долларов. Одно занятие можно попробовать бесплатно.", options: ["Great! Where is the locker room?", "Keep the change.", "Is it far from here?"] }
+        ] }
+    ] },
     { id: "ie", flag: "🇮🇪", name: "Ирландия", city: "Дублин", theme: "Еда и покупки", titles: ["Кофейня", "Ресторан: заказ", "Ресторан: счёт и чаевые", "Продуктовый магазин", "Рынок: цены и скидки", "Одежда: размер и примерка", "Возврат и обмен", "Покупки онлайн и доставка", "Паб", "Готовим дома по рецепту"] },
     { id: "au", flag: "🇦🇺", name: "Австралия", city: "Сидней", theme: "Поездки и отель", titles: ["Бронирование", "Аэропорт: регистрация", "Паспортный контроль", "В самолёте", "Потерялся багаж", "Заселение в отель", "Проблема в номере", "Экскурсия", "Пляж и отдых", "Выезд и отзыв"] },
     { id: "ca", flag: "🇨🇦", name: "Канада", city: "Торонто", theme: "Работа и учёба", titles: ["Резюме и рассказ о себе", "Собеседование", "Первый день на работе", "Совещание", "Деловые письма", "Созвон по видео", "Задачи и сроки", "Курсы и экзамены", "Зарплата и отпуск", "Знакомства по работе"] },
@@ -600,6 +804,9 @@ var TG = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.in
 function tgv(v) { try { return TG && TG.isVersionAtLeast && TG.isVersionAtLeast(v); } catch (e) { return false; } }
 if (TG) {
   try { TG.ready(); TG.expand(); } catch (e) {}
+  // во весь экран на телефонах (Telegram 8.0+), и чтобы свайп вниз не закрывал приложение посреди задания
+  try { if (tgv("8.0") && /^(ios|android)/.test(TG.platform || "")) TG.requestFullscreen(); } catch (e) {}
+  try { if (tgv("7.7")) TG.disableVerticalSwipes(); } catch (e) {}
   try { if (TG.colorScheme) document.documentElement.setAttribute("data-theme", TG.colorScheme); } catch (e) {}
 }
 function haptic(kind) {
@@ -615,15 +822,18 @@ function userName() { try { var u = TG && TG.initDataUnsafe && TG.initDataUnsafe
 /* ================= Содержание ================= */
 var C = window.CONTENT;
 var UK = C.countries[0];
+var PLAY = C.countries.filter(function (c) { return c.situations; });
 var WORDS = {}, PHRASES = {};
-UK.situations.forEach(function (s, si) {
-  s.index = si;
+PLAY.forEach(function (c) { c.situations.forEach(function (s, si) {
+  s.index = si; s.country = c;
   s.words = s.words.map(function (a) { var w = { en: a[0], ipa: a[1], ru: a[2], ex: a[3], exRu: a[4], sit: s.id }; WORDS[w.en] = w; return w; });
   s.phrases = s.phrases.map(function (a, i) { var p = { id: s.id + "-" + i, en: a[0], ru: a[1], sit: s.id }; PHRASES[p.id] = p; return p; });
-});
+}); });
+/* Текущая страна: первая открытая без визы; страна открывается после визы предыдущей */
+function curCountry() { for (var i = 0; i < PLAY.length; i++) if (!state.visas[PLAY[i].id]) return PLAY[i]; return PLAY[PLAY.length - 1]; }
 var ALL_WORDS = Object.keys(WORDS).map(function (k) { return WORDS[k]; });
 var TOTAL_WORDS = 500, TOTAL_SITS = 60;
-function sitById(id) { for (var i = 0; i < UK.situations.length; i++) if (UK.situations[i].id === id) return UK.situations[i]; return null; }
+function sitById(id) { for (var c = 0; c < PLAY.length; c++) for (var i = 0; i < PLAY[c].situations.length; i++) if (PLAY[c].situations[i].id === id) return PLAY[c].situations[i]; return null; }
 var SIT_COLORS = ["#2446C8", "#139A63", "#E0413A", "#7A4FD1", "#C98A12", "#0F7C8C", "#B8321F", "#16299A", "#8C1F4A", "#2F7D32"];
 var VISA_COLORS = { uk: "#16299A", us: "#B8321F", ie: "#139A63", au: "#C98A12", ca: "#D63B4A", nz: "#0F7C8C" };
 
@@ -759,8 +969,8 @@ function addXp(n) {
 function known(en) { var w = state.words[en]; return !!(w && w.b >= 1); }
 function learnedCount() { return Object.keys(state.words).filter(function (k) { return state.words[k].b >= 1; }).length; }
 function dueWords() { var d = dayNum(); return Object.keys(state.words).filter(function (k) { var w = state.words[k]; return WORDS[k] && w.b >= 1 && w.d <= d; }); }
-function doneSits() { return UK.situations.filter(function (s) { return s.id in state.sit; }).length; }
-function nextSit() { for (var i = 0; i < UK.situations.length; i++) if (!(UK.situations[i].id in state.sit)) return UK.situations[i]; return null; }
+function doneSits(c) { return (c ? [c] : PLAY).reduce(function (n, cc) { return n + cc.situations.filter(function (s) { return s.id in state.sit; }).length; }, 0); }
+function nextSit(c) { c = c || curCountry(); for (var i = 0; i < c.situations.length; i++) if (!(c.situations[i].id in state.sit)) return c.situations[i]; return null; }
 
 /* ================= Озвучка ================= */
 var TTS = "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function";
@@ -797,7 +1007,26 @@ var I = {
 
 /* ================= Сцена: Лондон ================= */
 function sceneArt(sit) {
-  return '<div class="scene-wrap">' + sceneUK() + '<img class="scene-photo" src="' + sit.id + '.jpg" alt="" onerror="this.remove()"></div>';
+  var cid = sit.country ? sit.country.id : sit.id;
+  return '<div class="scene-wrap">' + (cid === "us" ? sceneUS() : sceneUK()) + '<img class="scene-photo" src="' + sit.id + '.jpg" alt="" onerror="this.remove()"></div>';
+}
+function sceneUS() {
+  var bl = [[0, 70, 40], [44, 50, 34], [82, 88, 30], [116, 40, 26], [236, 60, 36], [276, 84, 30], [310, 46, 50]], b = "", win = "";
+  bl.forEach(function (x) { b += '<rect x="' + x[0] + '" y="' + x[1] + '" width="' + x[2] + '" height="' + (158 - x[1]) + '" fill="' + (x[1] < 60 ? "#5A6CA3" : "#6A7DB3") + '"/>';
+    for (var yy = x[1] + 8; yy < 150; yy += 12) for (var xx = x[0] + 5; xx < x[0] + x[2] - 5; xx += 9) win += '<rect x="' + xx + '" y="' + yy + '" width="4" height="6" fill="#F6EBC8" opacity=".55"/>'; });
+  return '<svg class="scene" viewBox="0 0 360 200" role="img" aria-label="Нью-Йорк: небоскрёбы и жёлтое такси">' +
+    '<defs><linearGradient id="skyUS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2B98A"/><stop offset="1" stop-color="#F7E3CF"/></linearGradient></defs>' +
+    '<rect width="360" height="200" fill="url(#skyUS)"/>' +
+    '<g class="cloud" fill="#fff" opacity=".7"><ellipse cx="60" cy="30" rx="28" ry="9"/><ellipse cx="80" cy="25" rx="18" ry="8"/></g>' +
+    '<path d="M0 158 L0 110 L30 110 L30 96 L60 96 L60 118 L360 118 L360 158 Z" fill="#B9A7C9" opacity=".6"/>' + b +
+    '<rect x="160" y="44" width="56" height="114" fill="#4B5C92"/><rect x="170" y="30" width="36" height="16" fill="#4B5C92"/><rect x="180" y="16" width="16" height="16" fill="#4B5C92"/>' +
+    '<line x1="188" y1="16" x2="188" y2="0" stroke="#4B5C92" stroke-width="3"/>' + win +
+    '<rect x="0" y="158" width="360" height="42" fill="#3E4C7A"/>' +
+    '<g stroke="#F6D25A" stroke-width="2" stroke-dasharray="10 12" opacity=".8"><line x1="0" y1="178" x2="360" y2="178"/></g>' +
+    '<g class="bus"><rect x="4" y="150" width="58" height="16" rx="5" fill="#F4C21B"/><path d="M16 150 L22 139 L44 139 L50 150 Z" fill="#F4C21B"/>' +
+      '<rect x="24" y="142" width="9" height="7" fill="#EAF0FF"/><rect x="35" y="142" width="9" height="7" fill="#EAF0FF"/><rect x="26" y="135" width="14" height="4" rx="1" fill="#1E2447"/>' +
+      '<g class="wheel"><circle cx="18" cy="167" r="5" fill="#1E2447"/><circle cx="48" cy="167" r="5" fill="#1E2447"/></g></g>' +
+    '</svg>';
 }
 function sceneUK() {
   var rain = "";
@@ -867,8 +1096,8 @@ function renderOnboarding() {
       "</div>" + dots + '<button class="btn" data-a="ob-next">Отправиться</button></div>';
   }
   if (obStep === 1) {
-    var goals = [[20, "Легко", "около 5 минут в день"], [50, "Нормально", "около 10 минут в день"], [100, "Серьёзно", "около 20 минут в день"]];
-    return '<div class="ob"><div class="grow"><h1>Сколько времени в дороге каждый день?</h1><p class="lead">Цель дня считается в очках за верные ответы. Выполняйте её каждый день, и будет расти серия.</p><div class="choices">' +
+    var goals = [[20, "Спокойный темп", "около 5 минут в день"], [50, "Обычный темп", "около 10 минут в день"], [100, "Интенсивный темп", "около 20 минут в день"]];
+    return '<div class="ob"><div class="grow"><h1>Сколько времени в дороге каждый день?</h1><p class="lead">Это цель дня, а не сложность: задания одинаковые, меняется только сколько очков набирать в день. Сложность подстроит тест уровня на следующем шаге.</p><div class="choices">' +
       goals.map(function (g) { return '<button class="choice" data-a="ob-goal" data-v="' + g[0] + '" aria-pressed="' + (state.goal === g[0]) + '"><span class="badge">' + g[0] + "</span><span><b>" + g[1] + "</b><span>" + g[2] + "</span></span></button>"; }).join("") +
       "</div></div>" + dots + '<button class="btn" data-a="ob-next">Дальше</button></div>';
   }
@@ -922,28 +1151,28 @@ function ringSvg(v, max) {
   return '<svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle class="track" cx="24" cy="24" r="' + r + '"/><circle class="val" cx="24" cy="24" r="' + r + '" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - p)).toFixed(1) + '"/></svg>';
 }
 function renderMap() {
-  var name = userName(), s = streakNow(), tx = todayXp(), n = doneSits(), next = nextSit(), due = dueWords();
+  var CC = curCountry(), name = userName(), s = streakNow(), tx = todayXp(), n = doneSits(CC), next = nextSit(CC), due = dueWords();
   var h = '<header class="top"><div class="hello">' + (name ? "Привет, " + esc(name) + "!" : "Привет!") + "</div>" +
     '<span class="chip' + (s ? "" : " off") + '" style="color:' + (s ? "var(--red)" : "") + '" title="Дней подряд">' + I.flame + s + '</span><span class="chip" style="color:var(--gold)" title="Очки">' + I.star + state.xp + "</span></header>";
   h += '<div class="goal">' + ringSvg(tx, state.goal) + "<div><b>" + (tx >= state.goal ? "Цель дня выполнена" : "Цель дня: " + tx + " из " + state.goal) + "</b><span>" +
     (tx >= state.goal ? "Серия продлена, можно продолжать" : "Осталось " + (state.goal - tx) + " " + plural(state.goal - tx, "очко", "очка", "очков")) + "</span></div></div>";
-  h += '<article class="airmail country"><div class="inner">' + sceneArt({ id: "uk" }) + '<div class="cap"><b>' + UK.flag + " " + UK.name + "</b><span>" + UK.city + '</span></div><div class="sub">' + UK.theme + ". Пройдено " + n + " из 10 ситуаций</div>" +
+  h += '<article class="airmail country"><div class="inner">' + sceneArt({ id: CC.id }) + '<div class="cap"><b>' + CC.flag + " " + CC.name + "</b><span>" + CC.city + '</span></div><div class="sub">' + CC.theme + ". Пройдено " + n + " из 10 ситуаций</div>" +
     '<div class="progress-line"><i style="width:' + (n * 10) + '%"></i></div>' +
     (next ? '<button class="btn" data-a="sit" data-v="' + next.id + '">Ситуация ' + (next.index + 1) + ": " + esc(next.title) + "</button>"
-          : state.visas.uk ? '<button class="btn quiet" disabled>Виза получена, следующая страна скоро</button>'
+          : state.visas[CC.id] ? '<button class="btn quiet" disabled>Виза получена, следующая страна скоро</button>'
           : '<button class="btn gold" data-a="customs">Пройти таможню</button>') + "</div></article>";
   if (due.length) h += '<button class="review" data-a="review"><span>Повторить слова<small>Пора освежить, пока не забылись</small></span><span class="n">' + Math.min(due.length, 12) + "</span></button>";
-  h += '<h3 class="section-t">Маршрут по Великобритании</h3><div class="route">';
-  UK.situations.forEach(function (st) {
+  h += '<h3 class="section-t">Маршрут по ' + CC.gen + '</h3><div class="route">';
+  CC.situations.forEach(function (st) {
     var done = st.id in state.sit, cur = next && next.id === st.id;
     h += '<button class="stop' + (done ? " done" : "") + (cur ? " current" : "") + '" data-a="sit" data-v="' + st.id + '"><span class="dot">' + (done ? I.check : st.index + 1) + "</span><span><b>" + esc(st.title) +
       "</b><small>" + (done ? "Пройдено, точность " + state.sit[st.id].best + "%" : cur ? "Следующая остановка" : "8 слов, 3 фразы, диалог") + "</small></span></button>";
   });
   var allDone = n === 10;
-  h += '<button class="stop customs' + (allDone ? "" : " locked") + '" data-a="customs"' + (allDone ? "" : " disabled") + '><span class="dot">' + (state.visas.uk ? "✓" : "🛂") + "</span><span><b>Таможня</b><small>" +
-    (state.visas.uk ? "Виза в паспорте" : allDone ? "Проверка страны: 15 заданий" : "Откроется после 10 ситуаций") + "</small></span></button></div>";
-  h += '<h3 class="section-t">Дальше по маршруту</h3><div class="next-countries">' + C.countries.slice(1).map(function (c) {
-    return '<div class="nc"><span class="flag" aria-hidden="true">' + c.flag + "</span><div><b>" + c.name + "</b><span>" + c.theme + '</span></div><span class="soon">скоро</span></div>';
+  h += '<button class="stop customs' + (allDone ? "" : " locked") + '" data-a="customs"' + (allDone ? "" : " disabled") + '><span class="dot">' + (state.visas[CC.id] ? "✓" : "🛂") + "</span><span><b>Таможня</b><small>" +
+ (state.visas[CC.id] ? "Виза в паспорте" : allDone ? "Проверка страны: 15 заданий" : "Откроется после 10 ситуаций") + "</small></span></button></div>";
+  h += '<h3 class="section-t">Дальше по маршруту</h3><div class="next-countries">' + C.countries.slice(C.countries.indexOf(CC) + 1).map(function (c) {
+    return '<div class="nc"><span class="flag" aria-hidden="true">' + c.flag + "</span><div><b>" + c.name + "</b><span>" + c.theme + '</span></div><span class="soon">' + (c.situations ? "после визы" : "скоро") + '</span></div>';
   }).join("") + "</div>";
   return h;
 }
@@ -952,7 +1181,7 @@ function renderMap() {
 function visaHtml(c, have, rot) {
   var col = VISA_COLORS[c.id];
   return '<div class="visa' + (have ? "" : " empty") + '" style="--vc:' + (have ? col : "") + ";--r:" + rot + 'deg"><div class="flag">' + c.flag + "</div><b>" + c.name + "</b><small>" +
-    (have ? "ВИЗА ВЫДАНА" : c.id === "uk" ? "после таможни" : "скоро") + "</small></div>";
+    (have ? "ВИЗА ВЫДАНА" : c.situations ? "после таможни" : "скоро") + "</small></div>";
 }
 function renderPassport() {
   var h = '<header class="top"><div class="hello">Паспорт путешественника</div></header>';
@@ -962,7 +1191,7 @@ function renderPassport() {
   h += '<h3 class="section-t">Настройки</h3><div class="settings"><div class="row-t">Цель дня, очков</div><div class="seg">' +
     [20, 50, 100].map(function (g) { return '<button data-a="set-goal" data-v="' + g + '" aria-pressed="' + (state.goal === g) + '">' + g + "</button>"; }).join("") +
     '</div><button class="btn quiet" data-a="retest" style="margin-top:10px">Пройти тест уровня заново</button><button class="link" data-a="reset">Сбросить весь прогресс</button></div>' +
-    '<p class="foot">Прогресс сохраняется: ' + esc(storageName) + '.<br>Прототип: открыта Великобритания, 10 ситуаций и 80 слов.' + (state.placed ? "<br>Ваш уровень по тесту: " + esc(state.placed.label.toLowerCase()) : "") + "</p>";
+    '<p class="foot">Прогресс сохраняется: ' + esc(storageName) + '.<br>Открыты Великобритания и США: 20 ситуаций и 160 слов.' + (state.placed ? "<br>Ваш уровень по тесту: " + esc(state.placed.label.toLowerCase()) : "") + "</p>";
   return h;
 }
 
@@ -975,9 +1204,12 @@ function startSit(id) {
 }
 function startCustoms() {
   var d = dayNum();
-  if (state.customsTry.uk === d && !state.visas.uk) { dialog = { kind: "info", title: "Таможня откроется завтра", text: "Сегодня попытка уже была. Повторите слова, и завтра попробуйте снова." }; renderOverlay(); return; }
-  var words = pick(ALL_WORDS, 10), phrases = pick(Object.keys(PHRASES).map(function (k) { return PHRASES[k]; }), 5);
-  session = { kind: "customs", phase: "scene", words: words };
+  var CC = curCountry();
+  if (state.customsTry[CC.id] === d && !state.visas[CC.id]) { dialog = { kind: "info", title: "Таможня откроется завтра", text: "Сегодня попытка уже была. Повторите слова, и завтра попробуйте снова." }; renderOverlay(); return; }
+  var cw = [], cp = [];
+  CC.situations.forEach(function (st) { cw = cw.concat(st.words); cp = cp.concat(st.phrases); });
+  var words = pick(cw, 10), phrases = pick(cp, 5);
+  session = { kind: "customs", phase: "scene", words: words, country: CC };
   session.items = shuffle(buildItems(words, false).concat(phrases.map(function (p) { return prep({ p: p, type: "order" }); })));
   resetQuiz(); haptic(); render();
 }
@@ -1017,7 +1249,7 @@ function phasePct() {
 function renderSession() {
   var s = session;
   if (s.kind === "customs" && s.phase === "scene") {
-    return topBar(0) + '<div class="scene-intro"><div style="font-size:64px;text-align:center" aria-hidden="true">🛂</div><h2>Таможня Великобритании</h2><p>15 заданий по словам и фразам страны. Чтобы получить визу, нужно ответить верно хотя бы на 12. Ошибки здесь не возвращаются, как на настоящем экзамене.</p></div><button class="btn gold" data-a="customs-go">Начать проверку</button>';
+    return topBar(0) + '<div class="scene-intro"><div style="font-size:64px;text-align:center" aria-hidden="true">🛂</div><h2>Таможня ' + s.country.gen + '</h2><p>15 заданий по словам и фразам страны. Чтобы получить визу, нужно ответить верно хотя бы на 12. Ошибки здесь не возвращаются, как на настоящем экзамене.</p></div><button class="btn gold" data-a="customs-go">Начать проверку</button>';
   }
   if (s.phase === "quiz") return renderQuiz();
   var sit = s.sit, h = topBar(phasePct(), (sit.index + 1) + "/10");
@@ -1033,7 +1265,7 @@ function renderSession() {
     var w = s.learn[s.idx];
     h += '<p class="step-t">Новое слово ' + (s.idx + 1) + " из " + s.learn.length + "</p>" +
       '<div class="card3d' + (s.flipped ? " is-flipped" : "") + '" data-a="flip" role="button" tabindex="0" aria-label="Перевернуть открытку">' +
-        '<div class="face front airmail"><div class="inner"><span class="postmark" aria-hidden="true">' + UK.flag + "</span>" +
+        '<div class="face front airmail"><div class="inner"><span class="postmark" aria-hidden="true">' + s.sit.country.flag + "</span>" +
           (TTS ? '<button class="speak corner" data-a="speak" data-v="' + esc(w.en) + '" aria-label="Послушать слово">' + I.speaker + "</button>" : "") +
           '<div class="word">' + esc(w.en) + '</div><div class="ipa">/' + esc(w.ipa) + '/</div><div class="flip-hint">Нажмите, чтобы увидеть перевод</div></div></div>' +
         '<div class="face back airmail"><div class="inner">' + (TTS ? '<button class="speak corner" data-a="speak" data-v="' + esc(w.ex) + '" aria-label="Послушать пример">' + I.speaker + "</button>" : "") +
@@ -1180,11 +1412,11 @@ function finish() {
   if (s.kind === "sit") { var prev = state.sit[s.sit.id]; extra.first = !prev; state.sit[s.sit.id] = { best: Math.max(prev ? prev.best : 0, acc) }; }
   if (s.kind === "customs") {
     extra.passed = s.correct >= 12;
-    if (extra.passed) state.visas.uk = d; else state.customsTry.uk = d;
+    if (extra.passed) state.visas[s.country.id] = d; else state.customsTry[s.country.id] = d;
     extra.correct = s.correct; extra.total = s.items.length;
   }
   save();
-  result = { kind: s.kind, sit: s.sit, xp: xp, acc: acc, best: s.best, goalNow: goalNow, extra: extra, n: words.length };
+  result = { kind: s.kind, sit: s.sit, country: s.country, xp: xp, acc: acc, best: s.best, goalNow: goalNow, extra: extra, n: words.length };
   session = null; dialog = null; render(); window.scrollTo(0, 0);
   haptic(result.kind === "customs" && !extra.passed ? "bad" : "ok"); countUp();
   if (!REDUCED && !(result.kind === "customs" && !extra.passed)) confetti();
@@ -1192,14 +1424,14 @@ function finish() {
 
 /* ---------- итоги ---------- */
 function stampHtml(sit) {
-  return '<div class="stamp" style="--r:-5deg"><div class="face" style="background:' + SIT_COLORS[sit.index] + '"><span class="glyph">' + UK.flag + '</span><span class="name">' + esc(sit.title) + "</span></div></div>";
+  return '<div class="stamp" style="--r:-5deg"><div class="face" style="background:' + SIT_COLORS[sit.index] + '"><span class="glyph">' + sit.country.flag + '</span><span class="name">' + esc(sit.title) + "</span></div></div>";
 }
 function renderResult() {
   var r = result, h = '<div class="result">';
   if (r.kind === "customs") {
     if (r.extra.passed) {
-      h += "<h1>Виза получена!</h1><p class=\"lead\">" + r.extra.correct + " из " + r.extra.total + " верно. Великобритания пройдена, её виза теперь в вашем паспорте.</p>" +
-        '<div class="slam">' + visaHtml(UK, true, -6) + "</div>";
+      h += "<h1>Виза получена!</h1><p class=\"lead\">" + r.extra.correct + " из " + r.extra.total + " верно. " + r.country.done + ", виза теперь в вашем паспорте.</p>" +
+        '<div class="slam">' + visaHtml(r.country, true, -6) + "</div>";
     } else {
       h += '<div style="font-size:60px;line-height:1" aria-hidden="true">🛂</div><h1>Почти получилось</h1><p class="lead">' + r.extra.correct + " из " + r.extra.total + " верно, а нужно 12. Повторите слова, и завтра таможня откроется снова.</p>";
     }

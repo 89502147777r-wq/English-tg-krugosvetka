@@ -167,6 +167,14 @@ h1, h2, h3, p { margin: 0; }
 button.nc { width: 100%; border: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
 button.nc .flag { filter: none; }
 .nc .got { margin-left: auto; font-size: 12px; font-weight: 700; color: #fff; background: var(--mint, #139A63); border-radius: 10px; padding: 5px 9px; white-space: nowrap; }
+.trip { display: flex; align-items: center; justify-content: space-between; margin: 0 0 14px; padding: 10px 12px; border-radius: 18px; background: var(--card); box-shadow: var(--shadow); position: relative; }
+.trip::before { content: ""; position: absolute; left: 30px; right: 30px; top: 50%; border-top: 2px dashed var(--line); }
+.trip .tc { position: relative; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; line-height: 1; border: 2px solid transparent; background: var(--card); padding: 0; cursor: default; }
+.trip .tc.future { opacity: 0.4; filter: grayscale(0.6); }
+.trip .tc.passed { cursor: pointer; border-color: #139A63; }
+.trip .tc.cur { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(36, 70, 200, 0.15); cursor: pointer; }
+.trip .tc.viewing { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(232, 180, 76, 0.25); }
+.trip .tc i { position: absolute; right: -4px; bottom: -4px; width: 16px; height: 16px; border-radius: 50%; background: #139A63; color: #fff; font-size: 10px; font-style: normal; font-weight: 800; display: grid; place-items: center; }
 .back-link { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 12px; padding: 8px 12px; border: 0; border-radius: 12px; background: var(--card); color: var(--blue); font: inherit; font-weight: 700; box-shadow: var(--shadow); cursor: pointer; }
 .nc b { display: block; }
 .nc span { color: var(--muted); font-size: 14px; }
@@ -1161,6 +1169,13 @@ function renderMap() {
     '<span class="chip' + (s ? "" : " off") + '" style="color:' + (s ? "var(--red)" : "") + '" title="Дней подряд">' + I.flame + s + '</span><span class="chip" style="color:var(--gold)" title="Очки">' + I.star + state.xp + "</span></header>";
   h += '<div class="goal">' + ringSvg(tx, state.goal) + "<div><b>" + (tx >= state.goal ? "Цель дня выполнена" : "Цель дня: " + tx + " из " + state.goal) + "</b><span>" +
     (tx >= state.goal ? "Серия продлена, можно продолжать" : "Осталось " + (state.goal - tx) + " " + plural(state.goal - tx, "очко", "очка", "очков")) + "</span></div></div>";
+  h += '<div class="trip" aria-label="Маршрут по странам">' + C.countries.map(function (c) {
+    var passed = !!state.visas[c.id] && c !== CUR, cur = c === CUR, cls = passed ? "passed" : cur ? "cur" : "future";
+    if (c === CC && CC !== CUR) cls += " viewing";
+    var t = c.name + (passed ? ": виза получена" : cur ? ": сейчас здесь" : ": впереди");
+    return (passed || cur) ? '<button class="tc ' + cls + '" data-a="country" data-v="' + (cur ? "" : c.id) + '" title="' + t + '" aria-label="' + t + '">' + c.flag + (passed ? "<i>✓</i>" : "") + "</button>"
+      : '<span class="tc ' + cls + '" title="' + t + '" aria-label="' + t + '">' + c.flag + "</span>";
+  }).join("") + "</div>";
   if (CC !== CUR) h += '<button class="back-link" data-a="country" data-v="">← К текущей стране: ' + CUR.flag + " " + CUR.name + "</button>";
   h += '<article class="airmail country"><div class="inner">' + sceneArt({ id: CC.id }) + '<div class="cap"><b>' + CC.flag + " " + CC.name + "</b><span>" + CC.city + '</span></div><div class="sub">' + CC.theme + ". Пройдено " + n + " из 10 ситуаций</div>" +
     '<div class="progress-line"><i style="width:' + (n * 10) + '%"></i></div>' +
@@ -1178,10 +1193,6 @@ function renderMap() {
   var cOpen = allDone && !state.visas[CC.id];
   h += '<button class="stop customs' + (allDone ? "" : " locked") + '" data-a="customs"' + (cOpen ? "" : " disabled") + '><span class="dot">' + (state.visas[CC.id] ? "✓" : "🛂") + "</span><span><b>Таможня</b><small>" +
  (state.visas[CC.id] ? "Виза в паспорте" : allDone ? "Проверка страны: 15 заданий" : "Откроется после 10 ситуаций") + "</small></span></button></div>";
-  var passed = PLAY.filter(function (c) { return state.visas[c.id] && c !== CC; });
-  if (passed.length) h += '<h3 class="section-t">Пройденные страны</h3><div class="next-countries">' + passed.map(function (c) {
-    return '<button class="nc" data-a="country" data-v="' + c.id + '"><span class="flag" aria-hidden="true">' + c.flag + "</span><div><b>" + c.name + "</b><span>" + c.theme + "</span></div>" + '<span class="got">Виза ✓</span></button>';
-  }).join("") + "</div>";
   h += '<h3 class="section-t">Дальше по маршруту</h3><div class="next-countries">' + C.countries.slice(C.countries.indexOf(CUR) + 1).map(function (c) {
     return '<div class="nc"><span class="flag" aria-hidden="true">' + c.flag + "</span><div><b>" + c.name + "</b><span>" + c.theme + '</span></div><span class="soon">' + (c.situations ? "после визы" : "скоро") + '</span></div>';
   }).join("") + "</div>";
